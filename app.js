@@ -82,40 +82,15 @@ Vue.component('draw', {
         },
         getSocket(msg) {
 
+            this.context.beginPath()
+            this.context.moveTo(msg.from.x - this.rect.left, msg.from.y - this.rect.top)
+            this.context.lineTo(msg.to.x - this.rect.left, msg.to.y - this.rect.top)
+            // this.context.moveTo(msg.from.x - this.rect.left, msg.from.y - this.rect.top)
+            this.context.strokeStyle = msg.userColor
+            this.context.lineWidth = 2
 
-            var c = document.getElementById('canvas')
-            var rect = c.getBoundingClientRect()
-            var ctx = c.getContext('2d')
-            ctx.clearRect(0, 0, 800, 800)
-            // ctx.lineTo(this.currentMouse.x, this.currentMouse.y)
-
-            // var xDist = Math.abs(x - this.previous.x)
-            // var yDist = Math.abs(y - this.previous.y)
-            //
-            // if (xDist < 50 && yDist < 50) {
-            //     ctx.moveTo(this.previous.x - rect.left, this.previous.y - rect.top)
-            // }
-            // else {
-            //     ctx.moveTo(x - rect.left, y - rect.top)
-            // }
-            //
-            // ctx.lineTo(x - rect.left, y - rect.top)
-            // ctx.strokeStyle = this.userColor
-            // ctx.lineWidth = 2
-            // ctx.stroke()
-            //
-            // this.previous.x = x
-            // this.previous.y = y
-
-            ctx.beginPath()
-            ctx.moveTo(msg.from.x - rect.left, msg.from.y - rect.top)
-            ctx.lineTo(msg.to.x - rect.left, msg.to.y - rect.top)
-            // ctx.moveTo(msg.from.x - rect.left, msg.from.y - rect.top)
-            ctx.strokeStyle = msg.userColor
-            ctx.lineWidth = 2
-
-            ctx.closePath()
-            ctx.stroke()
+            // this.context.closePath()
+            this.context.stroke()
         },
         getRandomColor() {
             // Get a random unassigned color
@@ -137,11 +112,18 @@ Vue.component('draw', {
         }
     },
 
-    ready: function() {
+    mounted() {
         var c = document.getElementById('canvas')
         var ctx = c.getContext('2d')
         ctx.translate(0.5, 0.5)
         ctx.imageSmoothingEnabled = false
+        this.canvas = document.getElementById('canvas')
+        this.context = this.canvas.getContext('2d')
+        this.rect = this.canvas.getBoundingClientRect()
+        this.context.translate(0.5, 0.5)
+        this.context.imageSmoothingEnabled = false
+
+        // console.log(this.canvas, this.context)
     },
 
     created() {
