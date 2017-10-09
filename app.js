@@ -8,18 +8,23 @@ Vue.component('draw', {
 
     data() {
         return {
-            userColor: '',
+            canvas: null,
+            context: null,
+            rect: null,
+            socket: null,
             mouse: {
-                x: 0,
-                y: 0
+                userColor: '',
+                from: {
+                    x: 0,
+                    y: 0
+                },
+                to: {
+                    x: 0,
+                    y: 0
+                }
             },
             users: {},
-            previous: {
-                x: 0,
-                y: 0
-            },
-            down: false,
-            socket: null
+            down: false
         }
     },
 
@@ -46,21 +51,22 @@ Vue.component('draw', {
         handleMouseDown(event) {
             //   console.log('handleMouseDown')
             this.down = true
-            this.mouse = {
+            this.mouse.from = {
                 x: event.pageX,
                 y: event.pageY
             }
 
-            var c = document.getElementById('canvas')
-            var ctx = c.getContext('2d')
-            var rect = c.getBoundingClientRect()
-            ctx.moveTo(this.mouse.x - rect.left, this.mouse.y - rect.top)
+            // var c = document.getElementById('canvas')
+            // var ctx = c.getContext('2d')
+            // var rect = c.getBoundingClientRect()
+            // ctx.moveTo(this.mouse.x - rect.left, this.mouse.y - rect.top)
         },
         handleMouseUp() {
             this.down = false
         },
         handleMouseMove(event) {
-            this.mouse = {
+
+            this.mouse.to = {
                 x: event.pageX,
                 y: event.pageY
             }
@@ -69,8 +75,12 @@ Vue.component('draw', {
         },
         sendSocket() {
             this.socket.send(JSON.stringify(this.mouse))
+            this.mouse.from = {
+                x: this.mouse.to.x,
+                y: this.mouse.to.y
+            }
         },
-        getSocket(x, y) {
+        getSocket(msg) {
 
 
             var c = document.getElementById('canvas')
@@ -79,23 +89,33 @@ Vue.component('draw', {
             ctx.clearRect(0, 0, 800, 800)
             // ctx.lineTo(this.currentMouse.x, this.currentMouse.y)
 
-            var xDist = Math.abs(x - this.previous.x)
-            var yDist = Math.abs(y - this.previous.y)
+            // var xDist = Math.abs(x - this.previous.x)
+            // var yDist = Math.abs(y - this.previous.y)
+            //
+            // if (xDist < 50 && yDist < 50) {
+            //     ctx.moveTo(this.previous.x - rect.left, this.previous.y - rect.top)
+            // }
+            // else {
+            //     ctx.moveTo(x - rect.left, y - rect.top)
+            // }
+            //
+            // ctx.lineTo(x - rect.left, y - rect.top)
+            // ctx.strokeStyle = this.userColor
+            // ctx.lineWidth = 2
+            // ctx.stroke()
+            //
+            // this.previous.x = x
+            // this.previous.y = y
 
-            if (xDist < 50 && yDist < 50) {
-                ctx.moveTo(this.previous.x - rect.left, this.previous.y - rect.top)
-            }
-            else {
-                ctx.moveTo(x - rect.left, y - rect.top)
-            }
-
-            ctx.lineTo(x - rect.left, y - rect.top)
-            ctx.strokeStyle = this.userColor
+            ctx.beginPath()
+            ctx.moveTo(msg.from.x - rect.left, msg.from.y - rect.top)
+            ctx.lineTo(msg.to.x - rect.left, msg.to.y - rect.top)
+            // ctx.moveTo(msg.from.x - rect.left, msg.from.y - rect.top)
+            ctx.strokeStyle = msg.userColor
             ctx.lineWidth = 2
-            ctx.stroke()
 
-            this.previous.x = x
-            this.previous.y = y
+            ctx.closePath()
+            ctx.stroke()
         },
         getRandomColor() {
             // Get a random unassigned color
@@ -108,12 +128,12 @@ Vue.component('draw', {
             return color;
         },
         generateColor() {
-            while (true) {
-                var color = this.getRandomColor()
-                if (this.users.color == null) {
-                    return color
-                }
+            var color = this.getRandomColor()
+            // Repeat until we find a unique color
+            while (this.users.color != null) {
+                color = this.getRandomColor()
             }
+            return color
         }
     },
 
@@ -126,7 +146,7 @@ Vue.component('draw', {
 
     created() {
         // Setup our user
-        this.userColor = this.generateColor()
+        this.mouse.userColor = this.generateColor()
 
 
         // Create a socket instance
@@ -134,14 +154,12 @@ Vue.component('draw', {
         // Setup Listener
         const vm = this
         this.socket.onopen = function(event) {
-            vm.socket.send(JSON.stringify(vm.mouse))
+            // vm.socket.send(JSON.stringify(vm.mouse))
         	// Listen for messages
         	vm.socket.onmessage = function(event) {
         		console.log('Client received a message',event.data);
-                var messageObject = JSON.parse(event.data)
-                var x = parseInt(messageObject.x)
-                var y = parseInt(messageObject.y)
-                vm.getSocket(x, y)
+                const msg = JSON.parse(event.data)
+                vm.getSocket(msg)
         	}
         	// Listen for socket closes
         	vm.socket.onclose = function(event) {
