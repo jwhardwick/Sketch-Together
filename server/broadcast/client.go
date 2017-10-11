@@ -123,6 +123,17 @@ func (c *Client) writePump() {
 	}
 }
 
+// Send a welcome message to new clients joining
+func (c *Client) welcomeClient() {
+
+    var message = []byte{0111}
+    w, err := c.conn.NextWriter(websocket.TextMessage)
+    if err != nil {
+        return
+    }
+    w.Write(message)
+}
+
 // serveWs handles websocket requests from the peer.
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -132,6 +143,7 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
 	client.hub.register <- client
+
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.

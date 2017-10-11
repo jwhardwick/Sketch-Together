@@ -4,6 +4,10 @@
 
 package main
 
+import (
+    "log"
+)
+
 // hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
@@ -18,6 +22,9 @@ type Hub struct {
 
 	// Unregister requests from clients.
 	unregister chan *Client
+
+    // Store message history
+    history []Message
 }
 
 func newHub() *Hub {
@@ -26,20 +33,33 @@ func newHub() *Hub {
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
+        history:    make([]Message, 0, 0),
 	}
 }
+
 
 func (h *Hub) run() {
 	for {
 		select {
 		case client := <-h.register:
+            log.Printf("Registering Client\n")
 			h.clients[client] = true
+
+            for _, dataMessage := range h.history {
+                client.send <- dataMessage.data
+            }
+
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
 			}
 		case message := <-h.broadcast:
+            dataMessage := newMessage(message)
+
+            // Store message
+            h.history = append(h.history, *dataMessage)
+
 			for client := range h.clients {
 				select {
 				case client.send <- message:
