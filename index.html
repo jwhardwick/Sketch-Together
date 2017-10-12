@@ -8,24 +8,48 @@
 
         <!-- CSS -->
         <link rel="stylesheet" href="/node_modules/bulma/css/bulma.css">
+        <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="./node_modules/font-awesome/css/font-awesome.min.css">
 
 
 
     </head>
 
-    <body>
+    <body >
 
 
-        <div id="root" style="background-color:#C9D1E3;height:100%;">
-            <!-- <section class="is-medium" style="background:#F2EDE4;height:50px;">
-                asdf
-            </section> -->
+        <div id="root" >
 
-            <section>
-                <draw></draw>
+            <section class="hero is-warning is-primary">
+              <div class="hero-body">
+                <div class="container has-text-centered">
+                  <h1 class="title">
+                    Primary title
+                  </h1>
+                  <h2 class="subtitle">
+                    Primary subtitle
+                  </h2>
+                </div>
+              </div>
             </section>
 
 
+            <section style="background-color:hsl(0, 0%, 96%);height:100%;">
+
+                <draw></draw>
+                <footer class="footer" style="height:100%;">
+                  <div class="container">
+                    <div class="content has-text-centered">
+                      <p>
+                        <strong>Bulma</strong> by <a href="http://jgthms.com">Jeremy Thomas</a>. The source code is licensed
+                        <a href="http://opensource.org/licenses/mit-license.php">MIT</a>. The website content
+                        is licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0</a>.
+                      </p>
+                    </div>
+                  </div>
+                </footer>
+
+            </section>
 
 
         </div>
@@ -34,10 +58,7 @@
 
 
 
-
-
         <!-- JS -->
-
         <script src="./node_modules/vue/dist/vue.js"></script>
         <script src="./app.js"></script>
 
