@@ -13,7 +13,10 @@
   "devDependencies": {},
   "scripts": {
     "test": "",
-    "dev": "nodemon client.js"
+    "build":    "npm install & npm run buildGo",
+    "buildGo":  "cd src/go && godep save && make",
+    "dev":      "go run -race src/go/*.go & nodemon client.js",
+    "start":    "go run src/go/*.go & node client.js"
   },
   "author": "",
   "license": "ISC"
