@@ -1,3 +1,5 @@
+// Inspired by the examples found @ github.com/gorilla/websocket
+
 package main
 
 type Message struct {

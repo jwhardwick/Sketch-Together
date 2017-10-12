@@ -213,8 +213,6 @@ Vue.component('draw', {
             return colors[Math.floor(Math.random() * colors.length)]
         },
         closeConnection() {
-            console.log("Closing")
-
             this.sendSocket({close: true, color: this.mouse.color})
             this.socket.close()
         }
@@ -265,76 +263,9 @@ Vue.component('draw', {
             }
             // Listen for socket closes
             vm.socket.onclose = function(event) {
-                console.log('Client notified socket has closed', event)
             }
         }
     }
-})
-
-
-
-
-Vue.component('ping', {
-
-    template: `
-        <div>
-            <p><input v-model="input.message" type="text"></p>
-            <button @click="emitPing">Emit</button>
-            <br>
-            <p>Response is {{ response.message }}</p>
-        </div>
-    `,
-
-    data() {
-        return {
-            response: {
-                message: ''
-            },
-            input: {
-                message: 'Hello world!'
-            },
-            socket: null
-        }
-    },
-
-    methods: {
-        emitPing() {
-            this.socket.send(JSON.stringify(this.input))
-        }
-    },
-
-    created() {
-        // Create a socket instance
-        this.socket = new WebSocket('ws://localhost:8082/ws')
-    },
-
-    mounted() {
-        const vm = this
-        // this.socket.addEventListener('message', function (event) {
-        //     console.log(event.data)
-        //     vm.response = event.data
-        // })
-
-        this.socket.onopen = function(event) {
-
-            // Listen for messages
-            vm.socket.onmessage = function(event) {
-                console.log('Client received a message', event.data);
-                var jsonObject = JSON.parse(event.data)
-                vm.response.message = jsonObject.message
-            };
-
-            // Listen for socket closes
-            vm.socket.onclose = function(event) {
-                console.log('Client notified socket has closed', event);
-            };
-
-            // To close the socket....
-            //socket.close()
-
-        };
-    }
-
 })
 
 new Vue({

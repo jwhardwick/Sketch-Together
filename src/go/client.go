@@ -1,6 +1,4 @@
-// Inspiration from the G
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
+// Inspired by the examples found @ github.com/gorilla/websocket
 
 package main
 
